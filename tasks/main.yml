@@ -11,3 +11,40 @@
   pip: name={{item}} state=present
   with_items:
     - pygeoip
+
+- name: check whether GeoIP MaxMind files are installed
+  stat: path=/install_path/dshell/share/GeoIP
+  register:geolite
+
+- name:download GeoIP MaxMind data files
+  command: wget {{item}}
+  with_items:
+  - http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz
+  - http://download.maxmind.com/download/geoip/database/asnum/GeoIPASNumv6.dat.gz
+  - http://download.maxmind.com/download/geoip/database/asnum/GeoIPASNum.dat.gz
+  - http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
+  - http://geolite.maxmind.com/download/geoip/database/GeoIPv6.dat.gz
+  when:geolite.stat.exists == False
+
+- name: extract tarball
+  command: tar -xzvf {{item}}
+  with_items:
+  - http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz
+  - http://download.maxmind.com/download/geoip/database/asnum/GeoIPASNumv6.dat.gz
+  - http://download.maxmind.com/download/geoip/database/asnum/GeoIPASNum.dat.gz
+  - http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
+  - http://geolite.maxmind.com/download/geoip/database/GeoIPv6.dat.gz
+  when:geolite.stat.exists == False
+
+- name: move files to correct location
+  command: mv {{item}} /install_path/dshell/share/GeoIP
+  with_items:
+  - GeoIP.dat
+  - GeoIPv6.dat
+  - GeoIPASNum.dat
+  - GeoIPASNumv6.dat
+  when: geolite.stat.exists == False
+
+- name: make
+  command: "make"
+  when:geolite.stat.exists == False
