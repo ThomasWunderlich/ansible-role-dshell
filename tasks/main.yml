@@ -12,8 +12,27 @@
   with_items:
     - pygeoip
 
+- name: dshell installed?
+  stat: path=/home/{{ ansible_ssh_user}}/dshell
+  register: dshell
+
+- name: download dshell
+  git: repo=https://github.com/USArmyResearchLab/Dshell.git
+       dest={{ansible_ssh_user}}
+       version=master
+  sudo:false
+  when: dshell.stat.exists == False
+
+- name: ensure share directory exists
+  file: path=/home/{{ ansible_ssh_user }}/dshell/share
+        state=directory
+        owner={{ ansible_ssh_user }}
+        group={{ ansible_ssh_user }}
+        mode=700
+  #do we need when statement?
+
 - name: check whether GeoIP MaxMind files are installed
-  stat: path=/install_path/dshell/share/GeoIP
+  stat: path=/home/{{ ansible_ssh_user }}/dshell/share/GeoIP
   register:geolite
 
 - name:download GeoIP MaxMind data files
@@ -37,7 +56,7 @@
   when:geolite.stat.exists == False
 
 - name: move files to correct location
-  command: mv {{item}} /install_path/dshell/share/GeoIP
+  command: mv {{item}} /home/{{ ansible_ssh_user }}/dshell/share/GeoIP
   with_items:
   - GeoIP.dat
   - GeoIPv6.dat
