@@ -1,0 +1,12 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: ThomasWunderlich
+  description: Dshell security framework
+  platforms:
+  - name: Ubuntu
+    versions:
+    - all
+  categories:
+    - security
