@@ -16,7 +16,7 @@
   git: repo=https://github.com/USArmyResearchLab/Dshell.git
        dest={{ansible_ssh_user}}
        version=master
-  sudo:false
+  sudo: false
   when: dshell.stat.exists == False
 
 - name: ensure share directory exists
@@ -29,9 +29,9 @@
 
 - name: check whether GeoIP MaxMind files are installed
   stat: path=/home/{{ ansible_ssh_user }}/dshell/share/GeoIP
-  register:geolite
+  register: geolite
 
-- name:download GeoIP MaxMind data files
+- name: download GeoIP MaxMind data files
   command: wget {{item}}
   with_items:
   - http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz
@@ -39,7 +39,7 @@
   - http://download.maxmind.com/download/geoip/database/asnum/GeoIPASNum.dat.gz
   - http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
   - http://geolite.maxmind.com/download/geoip/database/GeoIPv6.dat.gz
-  when:geolite.stat.exists == False
+  when: geolite.stat.exists == False
 
 - name: extract tarball
   command: tar -xzvf {{item}}
@@ -49,7 +49,7 @@
   - http://download.maxmind.com/download/geoip/database/asnum/GeoIPASNum.dat.gz
   - http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
   - http://geolite.maxmind.com/download/geoip/database/GeoIPv6.dat.gz
-  when:geolite.stat.exists == False
+  when: geolite.stat.exists == False
 
 - name: move files to correct location
   command: mv {{item}} /home/{{ ansible_ssh_user }}/dshell/share/GeoIP
@@ -62,4 +62,4 @@
 
 - name: make
   command: "make"
-  when:geolite.stat.exists == False
+  when: geolite.stat.exists == False
