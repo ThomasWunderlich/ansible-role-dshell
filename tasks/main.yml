@@ -9,30 +9,28 @@
     - ipy
 
 - name: dshell installed?
-  stat: path=/home/{{ ansible_ssh_user}}/dshell
+  stat: path=/home/{{ansible_ssh_user}}/Dshell
   register: dshell
 
 - name: download dshell
   git: repo=https://github.com/USArmyResearchLab/Dshell.git
-       dest={{ansible_ssh_user}}
-       version=master
-  sudo: false
+       dest=/home/{{ ansible_ssh_user }}/
+       accept_hostkey=True
   when: dshell.stat.exists == False
 
 - name: ensure share directory exists
-  file: path=/home/{{ ansible_ssh_user }}/dshell/share
+  file: path=/home/{{ ansible_ssh_user }}/Dshell/share
         state=directory
         owner={{ ansible_ssh_user }}
         group={{ ansible_ssh_user }}
         mode=700
-  #do we need when statement?
 
 - name: check whether GeoIP MaxMind files are installed
-  stat: path=/home/{{ ansible_ssh_user }}/dshell/share/GeoIP
+  stat: path=/home/{{ansible_ssh_user}}/Dshell/share/GeoLiteCity.dat
   register: geolite
 
 - name: download GeoIP MaxMind data files
-  command: wget {{item}}
+  get_url: url={{item}} dest=/home/{{ansible_ssh_user}}/Dshell/share/
   with_items:
   - http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz
   - http://download.maxmind.com/download/geoip/database/asnum/GeoIPASNumv6.dat.gz
@@ -42,24 +40,15 @@
   when: geolite.stat.exists == False
 
 - name: extract tarball
-  command: tar -xzvf {{item}}
+  command: gunzip /home/{{ansible_ssh_user}}/Dshell/share/{{ item }}
   with_items:
-  - http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz
-  - http://download.maxmind.com/download/geoip/database/asnum/GeoIPASNumv6.dat.gz
-  - http://download.maxmind.com/download/geoip/database/asnum/GeoIPASNum.dat.gz
-  - http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
-  - http://geolite.maxmind.com/download/geoip/database/GeoIPv6.dat.gz
-  when: geolite.stat.exists == False
-
-- name: move files to correct location
-  command: mv {{item}} /home/{{ ansible_ssh_user }}/dshell/share/GeoIP
-  with_items:
-  - GeoIP.dat
-  - GeoIPv6.dat
-  - GeoIPASNum.dat
-  - GeoIPASNumv6.dat
+  - GeoIP.dat.gz
+  - GeoIPASNumv6.dat.gz
+  - GeoIPASNum.dat.gz
+  - GeoLiteCity.dat.gz
+  - GeoIPv6.dat.gz
   when: geolite.stat.exists == False
 
 - name: make
-  command: "make"
+  command: "make -f /home/{{ansible_ssh_user}}/Dshell/Makefile"
   when: geolite.stat.exists == False
