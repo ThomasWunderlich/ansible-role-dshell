@@ -14,7 +14,7 @@
 
 - name: download dshell
   git: repo=https://github.com/USArmyResearchLab/Dshell.git
-       dest=/home/{{ ansible_ssh_user }}/
+       dest=/home/{{ ansible_ssh_user }}/Dshell
        accept_hostkey=True
   when: dshell.stat.exists == False
 
