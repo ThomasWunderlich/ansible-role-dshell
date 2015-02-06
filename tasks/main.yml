@@ -50,5 +50,7 @@
   when: geolite.stat.exists == False
 
 - name: make
-  command: make chdir=/home/{{ansible_ssh_user}}/Dshell
+  command: {{ item }} chdir="/home/{{ansible_ssh_user}}/Dshell"
+  with_items:
+    - make
   when: geolite.stat.exists == False
