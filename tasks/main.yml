@@ -19,18 +19,15 @@
   when: dshell.stat.exists == False
 
 - name: ensure share directory exists
-  file: path=/home/{{ ansible_ssh_user }}/Dshell/share
+  file: path=/home/{{ ansible_ssh_user }}/Dshell/share/GeoIP
         state=directory
-        #owner={{ ansible_ssh_user }}
-        #group={{ ansible_ssh_user }}
-        #mode=700
 
 - name: check whether GeoIP MaxMind files are installed
-  stat: path=/home/{{ansible_ssh_user}}/Dshell/share/GeoLiteCity.dat
+  stat: path=/home/{{ansible_ssh_user}}/Dshell/share/GeoIP/GeoLiteCity.dat
   register: geolite
 
 - name: download GeoIP MaxMind data files
-  get_url: url={{item}} dest=/home/{{ansible_ssh_user}}/Dshell/share/
+  get_url: url={{item}} dest=/home/{{ansible_ssh_user}}/Dshell/share/GeoIP/
   with_items:
   - http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz
   - http://download.maxmind.com/download/geoip/database/asnum/GeoIPASNumv6.dat.gz
@@ -40,7 +37,7 @@
   when: geolite.stat.exists == False
 
 - name: extract tarball
-  command: gunzip /home/{{ansible_ssh_user}}/Dshell/share/{{ item }}
+  command: gunzip /home/{{ansible_ssh_user}}/Dshell/share/GeoIP/{{ item }}
   with_items:
   - GeoIP.dat.gz
   - GeoIPASNumv6.dat.gz
