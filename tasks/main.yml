@@ -21,9 +21,9 @@
 - name: ensure share directory exists
   file: path=/home/{{ ansible_ssh_user }}/Dshell/share
         state=directory
-        owner={{ ansible_ssh_user }}
-        group={{ ansible_ssh_user }}
-        mode=700
+        #owner={{ ansible_ssh_user }}
+        #group={{ ansible_ssh_user }}
+        #mode=700
 
 - name: check whether GeoIP MaxMind files are installed
   stat: path=/home/{{ansible_ssh_user}}/Dshell/share/GeoLiteCity.dat
@@ -50,5 +50,5 @@
   when: geolite.stat.exists == False
 
 - name: make
-  command: "make -f /home/{{ansible_ssh_user}}/Dshell/Makefile"
+  command: make chdir=/home/{{ansible_ssh_user}}/Dshell
   when: geolite.stat.exists == False
